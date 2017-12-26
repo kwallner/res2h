@@ -5,12 +5,17 @@
 #include <vector>
 #include <algorithm>
 
+#if 1
+#include <boost/filesystem.hpp>
+namespace FS_NAMESPACE = boost::filesystem;
+#else
 #if defined(__GNUC__) || defined(__clang__)
 #include <experimental/filesystem>
 namespace FS_NAMESPACE = std::experimental::filesystem;
 #elif defined(_MSC_VER)
 #include <filesystem>
 namespace FS_NAMESPACE = std::tr2::sys;
+#endif
 #endif
 
 #include "res2h.h"
@@ -29,6 +34,7 @@ struct FileData
 
 bool beVerbose = false;
 bool useRecursion = false;
+bool useStaticDecl = false;
 bool useC = false;
 bool createBinary = false;
 bool appendFile = false;
@@ -224,6 +230,10 @@ bool readArguments(int argc, const char * argv[])
 		{
 			useRecursion = true;
 			pastFiles = true;
+		}
+		if (argument == "-S")
+		{
+			useStaticDecl = true;
 		}
 		else if (argument == "-v")
 		{
@@ -475,6 +485,12 @@ bool convertFile(FileData & fileData, const FS_NAMESPACE::path & commonHeaderPat
 				fileData.dataVariableName = fileData.outPath.filename().stem().string() + "_data";
 				fileData.sizeVariableName = fileData.outPath.filename().stem().string() + "_size";
 				// add size and data variable
+				// outStream << "#include <stdint.h>" << std::endl;
+				if (useStaticDecl)
+				{
+					outStream << "static ";
+				}
+#if 0
 				if (fileData.size <= UINT16_MAX)
 				{
 					outStream << "const uint16_t ";
@@ -487,7 +503,13 @@ bool convertFile(FileData & fileData, const FS_NAMESPACE::path & commonHeaderPat
 				{
 					outStream << "const uint64_t ";
 				}
+#endif
+				outStream << "const size_t ";
 				outStream << fileData.sizeVariableName << " = " << std::dec << fileData.size << ";" << std::endl;
+				if (useStaticDecl)
+				{
+					outStream << "static ";
+				}
 				outStream << "const uint8_t " << fileData.dataVariableName << "[" << std::dec << fileData.size << "] = {" << std::endl;
 				outStream << "    "; // first indent
 				// now add content

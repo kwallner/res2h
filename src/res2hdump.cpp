@@ -1,12 +1,17 @@
 #include <iostream>
 #include <fstream>
 
+#if 1
+#include <boost/filesystem.hpp>
+namespace FS_NAMESPACE = boost::filesystem;
+#else
 #if defined(__GNUC__) || defined(__clang__)
 #include <experimental/filesystem>
 namespace FS_NAMESPACE = std::experimental::filesystem;
 #elif defined(_MSC_VER)
 #include <filesystem>
 namespace FS_NAMESPACE = std::tr2::sys;
+#endif
 #endif
 
 #include "res2hinterface.h"

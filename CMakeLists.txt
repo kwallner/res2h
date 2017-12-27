@@ -12,10 +12,14 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 set(BOOST_ROOT ${CONAN_BOOST_ROOT})
-find_package(Boost 1.64 REQUIRED COMPONENTS filesystem system)
+find_package(Boost 1.65 REQUIRED COMPONENTS filesystem system)
 
 #-------------------------------------------------------------------------------
 #define basic sources and headers
+
+# Enable C++11
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(R2H_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/res2h.h
